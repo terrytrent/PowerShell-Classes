@@ -1,115 +1,250 @@
-Enum MakeOfCar 
-{ 
-    Unknown; 
-    Dodge; 
-    Lincoln; 
-    Cadilac; 
-} 
+Enum MakeOfCar
+{    
+    Unknown;
+    Dodge;
+    Lincoln;
+    Cadilac;
+}
 
-Enum DodgeModels 
-{ 
-    Unknown; 
-    Challenger; 
-    Charger; 
-    Dart; 
-} 
+Enum DodgeModels
+{
+    Unknown;
+    Challenger;
+    Charger;
+    Dart;
+}
 
-Enum LincolnModels 
-{ 
-    Unknown; 
-    Navigator; 
-    MKX; 
-    MKZ; 
-} 
+Enum LincolnModels
+{
+    Unknown;
+    Navigator;
+    MKX;
+    MKZ;
+}
 
-Enum CadilacModels 
-{ 
-    Unknown; 
-    Escalade; 
-    ATS; 
-    CTS; 
-} 
+Enum CadilacModels
+{
+    Unknown;
+    Escalade;
+    ATS;
+    CTS;
+}
 
-Enum CarColor 
-{ 
-    Unknown; 
-    Red; 
-    Silver; 
-    Black; 
-} 
+Enum CarColor
+{
+    Unknown;
+    Red;
+    Silver;
+    Black;
+}
 
-class car 
-{ 
-    [MakeOfCar]$make; 
-    [CarColor]$color; 
+class car
+{
+    [MakeOfCar]$make;
+    [CarColor]$color;
 
-    SetColor() 
-    { 
-        $colors=[CarColor].GetEnumValues() | where {$_ -ne 'Unknown'} 
-        $choice=read-host "Which Color do you want to specify?`n$(foreach($i in 1..3){"`n$i $($colors[$($i - 1)])"})`n`nChoice (#)" 
-        $ColorChoice=$colors[$($choice - 1)] 
+    SetColor()
+    {
+        $colors=[CarColor].GetEnumValues() | Where-Object {$_ -ne 'Unknown'}
+        $choice=$null
+        $ColorChoice=$null
+        function New-ColorChoice()
+        {
+            Param
+            (
+                [switch]$First
+            )
 
-        $this.Color=$ColorChoice 
-    } 
-} 
+            $TextColor='Green'
 
-class Dodge : car 
-{ 
-    [MakeOfCar]$make='Dodge' 
-    [DodgeModels]$model; 
+            if(!($First))
+            {
+                write-host "`nSorry, you must select one of the options available." -ForegroundColor Red
+                $TextColor='Yellow'
+            }
 
+            $choice=write-host "`nWhich Color do you want to specify?`n$(foreach($i in 1..$($colors.length)){"`n$i. $($colors[$($i - 1)])"})`n`nChoice (#):" -NoNewline -ForegroundColor $TextColor;Read-Host
+            return $choice
+        }
 
-    GetModelList() 
-    { 
-        [DodgeModels].GetEnumValues() | where {$_ -ne 'Unknown'} | %{write-host $_} 
-    } 
+        $choice=New-ColorChoice -First
+        
+        do{
+            if(($choice -le $($colors.length)) -and ($choice -ge 1))
+            {
+                $ColorChoice=$($colors[$($choice - 1)])
+            }
+            else
+            {
+                $choice=New-ColorChoice
+                $ColorChoice=$($colors[$($choice - 1)])
+            }
+        }
+        until(($choice -le $($colors.length)) -and ($choice -ge 1))
+        
+        $this.color=$ColorChoice
+        write-host "`nColor Updated: $($this.color)"
+    }
+}
 
-    SetModel() 
-    { 
-        $models=[DodgeModels].GetEnumValues() | where {$_ -ne 'Unknown'} 
-        $choice=read-host "Which Model do you want to specify?`n$(foreach($i in 1..3){"`n$i $($models[$($i - 1)])"})`n`nChoice (#)" 
-        $ModelChoice=$models[$($choice - 1)] 
+class Dodge : car
+{
+    [MakeOfCar]$make='Dodge'    
+    [DodgeModels]$model;
 
-    $this.model=$ModelChoice 
-    } 
-} 
+    GetModelList()
+    {
+        [DodgeModels].GetEnumValues() | where {$_ -ne 'Unknown'} | %{write-host $_}
+    }
 
-class Lincoln : car 
-{ 
-    [MakeOfCar]$make='Cadilac' 
-    [LincolnModels]$model 
+    SetModel()
+    {
+        $models=[DodgeModels].GetEnumValues() | Where-Object {$_ -ne 'Unknown'}
+        $choice=$null
+        $ModelChoice=$null
+        function New-ModelChoice()
+        {
+            Param
+            (
+                [switch]$First
+            )
 
-    GetModelList() 
-    { 
-        [LincolnModels].GetEnumValues() | where {$_ -ne 'Unknown'} | %{write-host $_} 
-    } 
+            $TextColor='Green'
 
-    SetModel() 
-    { 
-        $models=[LincolnModels].GetEnumValues() | where {$_ -ne 'Unknown'} 
-        $choice=read-host "Which Model do you want to specify?`n$(foreach($i in 1..3){"`n$i $($models[$($i - 1)])"})`n`nChoice (#)" 
-        $ModelChoice=$models[$($choice - 1)] 
+            if(!($First))
+            {
+                write-host "`nSorry, you must select one of the options available." -ForegroundColor Red
+                $TextColor='Yellow'
+            }
 
-        $this.model=$ModelChoice 
-    } 
-} 
+            $choice=write-host "`nWhich Model do you want to specify?`n$(foreach($i in 1..$($models.length)){"`n$i. $($models[$($i - 1)])"})`n`nChoice (#):" -NoNewline -ForegroundColor $TextColor;Read-Host
+            return $choice
+        }
 
-class Cadilac : car 
-{ 
-    [MakeOfCar]$make='Cadilac' 
-    [CadilacModels]$model 
+        $choice=New-ModelChoice -First
+        
+        do{
+            if(($choice -le $($models.length)) -and ($choice -ge 1))
+            {
+                $ModelChoice=$($models[$($choice - 1)])
+            }
+            else
+            {
+                $choice=New-ModelChoice
+                $ModelChoice=$($models[$($choice - 1)])
+            }
+        }
+        until(($choice -le $($models.length)) -and ($choice -ge 1))
+        
+        $this.model=$ModelChoice
+        write-host "`nModel Updated: $($this.model)"
+    }
+}
 
-    GetModelList() 
-    { 
-        [CadilacModels].GetEnumValues() | where {$_ -ne 'Unknown'} | %{write-host $_} 
-    } 
+class Lincoln : car
+{
+    [MakeOfCar]$make='Cadilac'
+    [LincolnModels]$model
 
-    SetModel() 
-    { 
-        $models=[CadilacModels].GetEnumValues() | where {$_ -ne 'Unknown'} 
-        $choice=read-host "Which Model do you want to specify?`n$(foreach($i in 1..3){"`n$i $($models[$($i - 1)])"})`n`nChoice (#)" 
-        $ModelChoice=$models[$($choice - 1)] 
+    GetModelList()
+    {
+        [LincolnModels].GetEnumValues() | where {$_ -ne 'Unknown'} | %{write-host $_}
+    }
 
-        $this.model=$ModelChoice 
-    } 
+    SetModel()
+    {
+        $models=[LincolnModels].GetEnumValues() | Where-Object {$_ -ne 'Unknown'}
+        $choice=$null
+        $ModelChoice=$null
+        function New-ModelChoice()
+        {
+            Param
+            (
+                [switch]$First
+            )
+
+            $TextColor='Green'
+
+            if(!($First))
+            {
+                write-host "`nSorry, you must select one of the options available." -ForegroundColor Red
+                $TextColor='Yellow'
+            }
+
+            $choice=write-host "`nWhich Model do you want to specify?`n$(foreach($i in 1..$($models.length)){"`n$i. $($models[$($i - 1)])"})`n`nChoice (#):" -NoNewline -ForegroundColor $TextColor;Read-Host
+            return $choice
+        }
+
+        $choice=New-ModelChoice -First
+        
+        do{
+            if(($choice -le $($models.length)) -and ($choice -ge 1))
+            {
+                $ModelChoice=$($models[$($choice - 1)])
+            }
+            else
+            {
+                $choice=New-ModelChoice
+                $ModelChoice=$($models[$($choice - 1)])
+            }
+        }
+        until(($choice -le $($models.length)) -and ($choice -ge 1))
+        
+        $this.model=$ModelChoice
+        write-host "`nModel Updated: $($this.model)"
+    }
+}
+
+class Cadilac : car
+{
+    [MakeOfCar]$make='Cadilac'
+    [CadilacModels]$model
+
+    GetModelList()
+    {
+        [CadilacModels].GetEnumValues() | Where-Object {$_ -ne 'Unknown'} | %{write-host $_}
+    }
+
+    SetModel()
+    {
+        $models=[CadilacModels].GetEnumValues() | Where-Object {$_ -ne 'Unknown'}
+        $choice=$null
+        $ModelChoice=$null
+        function New-ModelChoice()
+        {
+            Param
+            (
+                [switch]$First
+            )
+
+            $TextColor='Green'
+
+            if(!($First))
+            {
+                write-host "`nSorry, you must select one of the options available." -ForegroundColor Red
+                $TextColor='Yellow'
+            }
+
+            $choice=write-host "`nWhich Model do you want to specify?`n$(foreach($i in 1..$($models.length)){"`n$i. $($models[$($i - 1)])"})`n`nChoice (#):" -NoNewline -ForegroundColor $TextColor;Read-Host
+            return $choice
+        }
+
+        $choice=New-ModelChoice -First
+        
+        do{
+            if(($choice -le $($models.length)) -and ($choice -ge 1))
+            {
+                $ModelChoice=$($models[$($choice - 1)])
+            }
+            else
+            {
+                $choice=New-ModelChoice
+                $ModelChoice=$($models[$($choice - 1)])
+            }
+        }
+        until(($choice -le $($models.length)) -and ($choice -ge 1))
+        
+        $this.model=$ModelChoice
+        write-host "`nModel Updated: $($this.model)"
+    }
 }
